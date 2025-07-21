@@ -21,6 +21,8 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
+use Filament\Navigation\NavigationItem;
+use Filament\Navigation\NavigationBuilder;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -39,6 +41,20 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+        //    ->navigation(function (NavigationBuilder $builder): NavigationBuilder {
+        //         return $builder
+        //             ->items([
+        //                 // Ini memanggil semua menu default dari resource, pages, widgets, dsb
+        //                 ...$builder->getItems(),
+
+        //                 // Ini item custom yang kamu tambahkan
+        //                 NavigationItem::make('API Documentation')
+        //                     ->url('/api/documentation')
+        //                     ->icon('heroicon-o-code-bracket-square')
+        //                     ->openUrlInNewTab()
+        //                     ->group('Utilities'),
+        //             ]);
+        //     })
             ->maxContentWidth(MaxWidth::SevenExtraLarge)
             ->sidebarCollapsibleOnDesktop()
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
@@ -130,5 +146,18 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
+    }
+
+    protected function customNavigation(): \Closure
+    {
+        return function () {
+            return [
+                NavigationItem::make('API Docs')
+                    ->label('API Documentation')
+                    ->url('/api/documentation') // Bisa pakai route juga
+                    ->icon('heroicon-o-code-bracket-square')
+                    ->openUrlInNewTab(),
+            ];
+        };
     }
 }

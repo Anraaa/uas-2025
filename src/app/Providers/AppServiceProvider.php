@@ -14,7 +14,9 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\ValidationException;
 use Spatie\Activitylog\Models\Activity;
 use Illuminate\Support\Facades\DB;
-
+use Filament\Facades\Filament;
+use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\NavigationItem;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -31,8 +33,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        DB::statement("SET time_zone = '+07:00'");
+        Filament::serving(function () {
+        Filament::registerNavigationItems([
+            NavigationItem::make('API Documentation')
+                ->url('/api/documentation')
+                ->icon('heroicon-o-code-bracket-square')
+                ->openUrlInNewTab()
+                ->group('Utilities'),
+        ]);
+    });
 
+        DB::statement("SET time_zone = '+07:00'");
         Gate::policy(Activity::class, ActivityPolicy::class);
         Page::formActionsAlignment(Alignment::Right);
         Notifications::alignment(Alignment::End);
