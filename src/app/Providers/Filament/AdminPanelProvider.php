@@ -63,6 +63,11 @@ class AdminPanelProvider extends PanelProvider
                 // 'profile' => \Filament\Navigation\MenuItem::make()
                 //     ->label(fn () => auth()->user()->name)
                 //     ->icon('heroicon-m-user-circle'),
+                MenuItem::make()
+                    ->label('Client Panel')
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->url('/client')
+                    ->visible(fn (): bool => auth()->user()->hasRole('super_admin'))
             ])
             ->plugins([
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make()

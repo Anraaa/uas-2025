@@ -19,12 +19,12 @@ class DatabaseSeeder extends Seeder
         
 
         $this->call([
-            //RoleSeeder::class,
+            RoleSeeder::class,
             PageConfigSeeder::class,
             LogoSeeder::class,
             SeoSeeder::class,
             FooterSeeder::class,
-            //StudioSeeder::class,
+            StudioSeeder::class,
         ]);
         $this->seedUsers();
     }

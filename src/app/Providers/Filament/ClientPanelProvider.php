@@ -17,6 +17,16 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\Navigation\MenuItem;
+use App\Filament\Client\Pages\StudioAvailability;
+use App\Filament\Client\Resources\BookingResource;
+use App\Filament\Client\Resources\BookingResource\Pages\PaymentBooking;
+use App\Filament\Pages\Auth\EditProfile;
+use App\Models\Payment;
+use App\Http\Responses\Client\LoginResponse;
+use Filament\Navigation\NavigationItem;
+use Filament\Pages\Auth\EditProfile as AuthEditProfile;
+use App\Filament\Client\Pages\Auth\Register;
 
 class ClientPanelProvider extends PanelProvider
 {
@@ -26,13 +36,28 @@ class ClientPanelProvider extends PanelProvider
             ->id('client')
             ->path('client')
             ->login()
+            ->registration(Register::class)
+            ->maxContentWidth('full')
+            ->passwordReset()
+            ->breadcrumbs(false)
+            ->spa()
+            //->defaultRole('user') 
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Emerald,
+            ])
+            ->userMenuItems([
+                MenuItem::make()
+                    ->label('Admin Panel')
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->url('/admin')
+                    ->visible(fn(): bool => auth()->user()->hasRole('super_admin'))
             ])
             ->discoverResources(in: app_path('Filament/Client/Resources'), for: 'App\\Filament\\Client\\Resources')
             ->discoverPages(in: app_path('Filament/Client/Pages'), for: 'App\\Filament\\Client\\Pages')
             ->pages([
                 Pages\Dashboard::class,
+                StudioAvailability::class,
+                /* PaymentBooking::class */
             ])
             ->discoverWidgets(in: app_path('Filament/Client/Widgets'), for: 'App\\Filament\\Client\\Widgets')
             ->widgets([
@@ -50,8 +75,18 @@ class ClientPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
+            ->favicon(asset('images/logo1.png'))
+            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->darkMode(false)
             ->authMiddleware([
                 Authenticate::class,
             ]);
+    }
+
+    public function resources(): array
+    {
+        return [
+            \App\Filament\Client\Resources\BookingResource::class,
+        ];
     }
 }

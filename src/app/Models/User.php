@@ -14,7 +14,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements FilamentUser, HasAvatar
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory,HasRoles, Notifiable;
+    use HasFactory, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -25,9 +25,12 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         'avatar_url',
         'name',
         'email',
+        'role',
         'password',
     ];
 
+
+    protected $guard_name = 'web';
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -51,6 +54,15 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         ];
     }
 
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            if (!$user->hasRole('user')) {
+                $user->assignRole('user');
+            }
+        });
+    }
+
     public function getFilamentAvatarUrl(): ?string
     {
         if ($this->avatar_url) {
@@ -64,6 +76,21 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        if ($panel->getId() === 'admin') {
+            // Cuma user dengan email @admin.com yang bisa akses panel admin
+            return str_ends_with($this->email, '@admin.com');
+        }
+
+        if ($panel->getId() === 'client') {
+            // Misal user dengan role 'user' boleh akses panel client
+            return $this->hasRole('user') || str_ends_with($this->email, '@admin.com');
+        }
+
+        // Default false kalau panel lain
+        return false;
+    }
+
+    public function bookings() {
+        return $this->hasMany(Booking::class);
     }
 }
