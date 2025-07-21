@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Seo;
 use App\Models\User;
+use Filament\Pages\Page;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -14,12 +16,30 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
+        
 
-        $user = \App\Models\User::factory()->create([
-            'name' => 'Admin',
-            'email' => 'admin@admin.com',
+        $this->call([
+            //RoleSeeder::class,
+            PageConfigSeeder::class,
+            LogoSeeder::class,
+            SeoSeeder::class,
+            FooterSeeder::class,
+            //StudioSeeder::class,
         ]);
+        $this->seedUsers();
+    }
 
-        $user->assignRole('super_admin');
+    private function seedUsers(): void
+    {
+        // Create Admin user if not exists
+        $adminEmail = 'admin@admin.com';
+        if (! User::where('email', $adminEmail)->exists()) {
+            $admin = User::create([
+                'name' => 'Admin',
+                'email' => $adminEmail,
+                'password' => bcrypt('password'),
+            ]);
+            $admin->assignRole('super_admin');
+        };
     }
 }
